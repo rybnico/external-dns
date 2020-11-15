@@ -223,16 +223,18 @@ func (p *HetznerProvider) newHetznerChanges(action string, endpoints []*endpoint
 		if e.RecordTTL.IsConfigured() {
 			ttl = int(e.RecordTTL)
 		}
-		change := &HetznerChanges{
-			Action: action,
-			ResourceRecordSet: hclouddns.HCloudRecord{
-				RecordType: hclouddns.RecordType(e.RecordType),
-				Name:       e.DNSName,
-				Value:      e.Targets[0],
-				TTL:        ttl,
-			},
+		for _, target := range e.Targets {
+			change := &HetznerChanges{
+				Action: action,
+				ResourceRecordSet: hclouddns.HCloudRecord{
+					RecordType: hclouddns.RecordType(e.RecordType),
+					Name:       e.DNSName,
+					Value:      target,
+					TTL:        ttl,
+				},
+			}
+			changes = append(changes, change)
 		}
-		changes = append(changes, change)
 	}
 	return changes
 }
